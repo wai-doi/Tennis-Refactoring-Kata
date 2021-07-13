@@ -1,5 +1,53 @@
 
 class TennisGame1
+  def initialize(player1Name, player2Name)
+    @player1 = Player.new(player1Name)
+    @player2 = Player.new(player2Name)
+  end
+
+  def won_point(playerName)
+    if playerName == @player1.name
+      @player1.get_point
+    else
+      @player2.get_point
+    end
+  end
+
+  def score
+    if @player1.score == @player2.score
+      same_score
+    elsif @player1.score >= 4 || @player2.score >= 4
+      finish_or_advantage
+    else
+      "#{@player1.ordinal_score}-#{@player2.ordinal_score}"
+    end
+  end
+
+  private
+
+  def same_score
+    {
+      0 => "Love-All",
+      1 => "Fifteen-All",
+      2 => "Thirty-All",
+    }.fetch(@player1.score, "Deuce")
+  end
+
+  def finish_or_advantage
+    score_diff = @player1.score- @player2.score
+    if score_diff == 1
+      "Advantage player1"
+    elsif score_diff == -1
+      "Advantage player2"
+    elsif score_diff >= 2
+      "Win for player1"
+    else
+      "Win for player2"
+    end
+  end
+end
+
+class Player
   ORDINAL_POINT = {
     0 => "Love",
     1 => "Fifteen",
@@ -7,45 +55,19 @@ class TennisGame1
     3 => "Forty",
   }
 
-  def initialize(player1Name, player2Name)
-    @player1Name = player1Name
-    @player2Name = player2Name
-    @p1points = 0
-    @p2points = 0
+  attr_reader :name, :score
+
+  def initialize(name)
+    @name = name
+    @score = 0
   end
 
-  def won_point(playerName)
-    if playerName == @player1Name
-      @p1points += 1
-    else
-      @p2points += 1
-    end
+  def get_point
+    @score += 1
   end
 
-  def score
-    if @p1points == @p2points
-      # 同点
-      {
-        0 => "Love-All",
-        1 => "Fifteen-All",
-        2 => "Thirty-All",
-      }.fetch(@p1points, "Deuce")
-    elsif @p1points >= 4 || @p2points >= 4
-      # 勝ちかアドバンテージ
-      point_diff = @p1points - @p2points
-
-      if point_diff == 1
-        "Advantage player1"
-      elsif point_diff == -1
-        "Advantage player2"
-      elsif point_diff >= 2
-        "Win for player1"
-      else
-        "Win for player2"
-      end
-    else
-      "#{ORDINAL_POINT[@p1points]}-#{ORDINAL_POINT[@p2points]}"
-    end
+  def ordinal_score
+    ORDINAL_POINT[score]
   end
 end
 
